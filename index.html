@@ -250,11 +250,11 @@
       let currentEditingData = null;
       async function fetchColorCodes() {
         try {
-          // 내 DB API에 색상 요청
+          // 내 서버(api.php)에 색상 요청
           const resp = await fetch(`${API_URL}?action=getColors`);
           if (resp.ok) {
-            // 가져온 색상 데이터 { "홍길동": "#ff0000", ... } 를 전역 변수에 저장
             colorCodes = await resp.json();
+            console.log("색상 로드 성공:", colorCodes); // 확인용 로그
           }
         } catch (e) {
           console.error("색상 정보 로딩 실패", e);
