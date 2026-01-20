@@ -3,74 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KSSE 통합 업무현황</title>
+    <title>KSSE 업무관리 (DB Ver)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --primary-color: #0b2b4e;
-            --accent-color: #ffd000;
-            --bg-gray: #f4f7f6;
-            --card-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
+        :root { --primary-color: #0b2b4e; --accent-color: #ffd000; --bg-gray: #f4f7f6; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-gray); display: flex; height: 100vh; overflow: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-gray); display: flex; height: 100vh; overflow: hidden; }
 
-        /* 사이드바 */
         .sidebar { width: 250px; background: var(--primary-color); color: white; padding: 25px; display: flex; flex-direction: column; }
-        .sidebar h2 { color: var(--accent-color); margin-bottom: 30px; font-size: 1.5rem; }
         .nav-item { padding: 15px; margin-bottom: 5px; border-radius: 8px; cursor: pointer; color: #ccc; transition: 0.3s; list-style: none; display: flex; align-items: center; gap: 10px; }
-        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.1); color: white; font-weight: bold; }
-        .nav-item.active { border-left: 4px solid var(--accent-color); }
+        .nav-item.active { background: rgba(255,255,255,0.1); color: white; font-weight: bold; border-left: 4px solid var(--accent-color); }
 
-        /* 메인 영역 */
         .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         header { padding: 15px 30px; background: white; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        
-        /* 컨트롤 영역 */
         .controls { display: flex; gap: 10px; align-items: center; }
-        input, select { padding: 8px; border: 1px solid #ddd; border-radius: 5px; }
-        .btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-primary { background: var(--primary-color); color: white; }
-        .btn-add { background: var(--accent-color); color: #0b2b4e; }
-        .btn-danger { background: #ff4757; color: white; }
-
-        /* 보드 레이아웃 (역순 배치) */
+        
         .board { display: flex; gap: 15px; padding: 20px; flex: 1; overflow-x: auto; }
         .category { flex: 1; min-width: 300px; background: #ebedef; border-radius: 10px; display: flex; flex-direction: column; }
-        .category h2 { padding: 15px; font-size: 1.1rem; color: #333; display: flex; justify-content: space-between; background: rgba(0,0,0,0.03); border-radius: 10px 10px 0 0; }
+        .category h2 { padding: 15px; font-size: 1.1rem; color: #333; display: flex; justify-content: space-between; }
         .event-list { padding: 10px; flex: 1; overflow-y: auto; min-height: 200px; }
-        
-        /* 드래그 효과 */
         .category.drag-over { background-color: #d1d8e0; border: 2px dashed var(--primary-color); }
 
-        /* 메모 카드 */
-        .memo-card { background: white; border-radius: 8px; padding: 15px; margin-bottom: 10px; box-shadow: var(--card-shadow); cursor: pointer; border-left: 5px solid #ccc; position: relative; }
-        .memo-card.dragging { opacity: 0.5; transform: scale(0.98); }
-        .memo-card h3 { font-size: 1rem; margin-bottom: 5px; color: #333; }
-        .memo-card p { font-size: 0.9rem; color: #666; white-space: pre-line; margin-bottom: 8px; }
-        .user-tag { font-size: 0.75rem; background: #eee; padding: 2px 6px; border-radius: 4px; position: absolute; top: 10px; right: 10px; color: #555; }
-        .attach-link { display: inline-block; font-size: 0.8rem; color: #007bff; text-decoration: none; margin-top: 5px; }
+        .memo-card { background: white; border-radius: 8px; padding: 15px; margin-bottom: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; border-left: 5px solid #ccc; }
+        .memo-card.dragging { opacity: 0.5; }
+        .user-tag { font-size: 0.75rem; background: #eee; padding: 2px 6px; border-radius: 4px; float: right; color: #555; }
         .feedback-box { margin-top: 8px; padding: 8px; background: #fff3cd; border: 1px solid #ffeeba; border-radius: 5px; font-size: 0.85rem; color: #856404; }
 
-        /* 모달 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 25px; border-radius: 10px; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .modal-content input, .modal-content textarea { width: 100%; margin-bottom: 10px; }
+        .modal-content { background: white; padding: 25px; border-radius: 10px; width: 400px; }
+        .modal-content input, .modal-content textarea { width: 100%; margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 5px; }
         .modal-footer { margin-top: 15px; display: flex; gap: 10px; justify-content: flex-end; }
+        .btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-primary { background: var(--primary-color); color: white; }
+        .btn-danger { background: #ff4757; color: white; }
     </style>
 </head>
 <body>
-
     <aside class="sidebar">
-        <h2>KSSE ERP</h2>
+        <h2 style="color:var(--accent-color)">KSSE ERP</h2>
         <ul style="padding:0;">
-            <li class="nav-item active">
-                <i class="fas fa-clipboard-list"></i> 업무 현황
-            </li>
-            <li class="nav-item" onclick="window.open('https://www.ksse.kr/scheduler/index.html')">
-                <i class="fas fa-calendar-alt"></i> 통합 스케줄러
-            </li>
+            <li class="nav-item active"><i class="fas fa-clipboard-list"></i> 업무 현황</li>
+            <li class="nav-item" onclick="window.open('https://www.ksse.kr/scheduler/index.html')"><i class="fas fa-calendar-alt"></i> 스케줄러</li>
         </ul>
         <div style="margin-top: auto;">
             <div id="currentUserDisplay" style="margin-bottom: 10px; font-size: 0.9rem;"></div>
@@ -80,34 +53,20 @@
 
     <main class="main-content">
         <header>
-            <h1>업무 현황 보드</h1>
+            <h1>업무 현황 (DB 연동)</h1>
             <div class="controls">
-                <select id="employeeFilter" style="display:none;">
-                    <option value="all">전체 사원 보기</option>
-                </select>
-                
+                <select id="employeeFilter" style="display:none; padding:8px;"><option value="all">전체 사원 보기</option></select>
                 <div id="loginSection">
                     <input type="text" id="loginIdInput" placeholder="ID 입력">
                     <button id="loginBtn" class="btn btn-primary">접속</button>
                 </div>
-
-                <button id="addMemoBtn" class="btn btn-add" style="display:none;">+ 새 업무</button>
+                <button id="addMemoBtn" class="btn" style="background:var(--accent-color); color:#0b2b4e; display:none;">+ 새 업무</button>
             </div>
         </header>
-
         <div class="board">
-            <div class="category" id="done">
-                <h2>완료 <span class="count">0</span></h2>
-                <div class="event-list" id="doneList"></div>
-            </div>
-            <div class="category" id="inProgress">
-                <h2>진행중 <span class="count">0</span></h2>
-                <div class="event-list" id="inProgressList"></div>
-            </div>
-            <div class="category" id="todo">
-                <h2>할 일 <span class="count">0</span></h2>
-                <div class="event-list" id="todoList"></div>
-            </div>
+            <div class="category" id="done"><h2>완료 <span class="count">0</span></h2><div class="event-list" id="doneList"></div></div>
+            <div class="category" id="inProgress"><h2>진행중 <span class="count">0</span></h2><div class="event-list" id="inProgressList"></div></div>
+            <div class="category" id="todo"><h2>할 일 <span class="count">0</span></h2><div class="event-list" id="todoList"></div></div>
         </div>
     </main>
 
@@ -116,12 +75,8 @@
             <h3 id="modalTitle" style="margin-bottom:15px;">업무 작성</h3>
             <input type="text" id="mTitle" placeholder="업무 제목">
             <textarea id="mContent" rows="5" placeholder="업무 내용"></textarea>
-            <input type="text" id="mAttach" placeholder="첨부파일 링크 (URL)">
-            
-            <div id="adminFeedbackArea" style="display:none;">
-                <textarea id="mFeedback" rows="2" placeholder="[관리자용] 피드백 입력"></textarea>
-            </div>
-
+            <input type="text" id="mAttach" placeholder="첨부파일 URL">
+            <div id="adminFeedbackArea" style="display:none;"><textarea id="mFeedback" rows="2" placeholder="[관리자용] 피드백 입력"></textarea></div>
             <div class="modal-footer">
                 <button id="deleteMemoBtn" class="btn btn-danger" style="display:none; margin-right:auto;">삭제</button>
                 <button id="closeModalBtn" class="btn" style="background:#eee;">닫기</button>
@@ -131,25 +86,19 @@
     </div>
 
     <script>
-        // *** 배포된 앱스크립트 URL 확인 필수 ***
-        const API_URL = 'https://script.google.com/macros/s/AKfycbz2NpbmaBYwyZsqUc6h3FJcIlg4I_-wTh2mlr1OW-lI9J66MyG7hk7OZuXMzWHAfEr5QA/exec';
-        //const API_URL = 'https://jsse.kr/api/api.php';
-        const API_KEY = 'AIzaSyCMPhYMgu-r4nDHUHvHl4PXyAFVFw0UKTk'; // Google Sheets API Key
-        const SHEET_ID = '16JGKZLzFVVxqbIiTDerkpkyEUizPrU6ltVw7h9MxP2k';
+        // *** 여기가 중요합니다! 경로가 맞는지 확인하세요 ***
+        // index.html과 api 폴더가 같은 위치라면 'api/api.php'
+        const API_URL = 'api/api.php'; 
 
         let employeeId = localStorage.getItem('ksse_employeeId') || "";
-        let colorCodes = {};
-        let currentEditingId = null; // 수정 중인 행 번호
-        let currentEditingData = null; // 수정 중인 데이터 객체
+        let currentEditingData = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
-            await fetchColorCodes();
             if (employeeId) {
                 initSession();
                 await fetchAndDisplay();
                 await setupAdminFilter();
             }
-
             document.getElementById('loginBtn').addEventListener('click', login);
             document.getElementById('logoutButton').addEventListener('click', logout);
             document.getElementById('addMemoBtn').addEventListener('click', () => openModal());
@@ -158,256 +107,123 @@
             document.getElementById('deleteMemoBtn').addEventListener('click', deleteMemo);
         });
 
-        // --- 인증 및 세션 ---
         function login() {
             const id = document.getElementById('loginIdInput').value.trim();
-            if (id) {
-                localStorage.setItem('ksse_employeeId', id);
-                location.reload();
-            }
+            if (id) { localStorage.setItem('ksse_employeeId', id); location.reload(); }
         }
-
-        function logout() {
-            localStorage.removeItem('ksse_employeeId');
-            location.reload();
-        }
-
+        function logout() { localStorage.removeItem('ksse_employeeId'); location.reload(); }
+        
         function initSession() {
             document.getElementById('loginSection').style.display = 'none';
             document.getElementById('addMemoBtn').style.display = 'block';
             document.getElementById('currentUserDisplay').textContent = `접속중: ${employeeId}`;
-            
-            if (employeeId === 'admin' || employeeId === 'ksse') {
-                document.getElementById('adminFeedbackArea').style.display = 'block';
-            }
-        }
-
-        // --- 데이터 조회 ---
-        async function fetchColorCodes() {
-            try {
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/고유설정!A2:C?key=${API_KEY}`;
-                const resp = await fetch(url);
-                const data = await resp.json();
-                if (data.values) {
-                    data.values.forEach(row => {
-                        if(row[0]) colorCodes[row[0].trim()] = row[2];
-                    });
-                }
-            } catch (e) { console.error("Color fetch failed", e); }
+            if (employeeId === 'admin' || employeeId === 'ksse') document.getElementById('adminFeedbackArea').style.display = 'block';
         }
 
         async function fetchAndDisplay(filterUser = 'all') {
             try {
-                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/memo!A2:F?key=${API_KEY}`;
-                const resp = await fetch(url);
+                const resp = await fetch(API_URL);
+                if (!resp.ok) throw new Error("서버 연결 실패");
                 const data = await resp.json();
                 const memos = data.values || [];
-
-                const lists = {
-                    todo: document.getElementById('todoList'),
-                    inProgress: document.getElementById('inProgressList'),
-                    done: document.getElementById('doneList')
-                };
+                
+                const lists = { todo: document.getElementById('todoList'), inProgress: document.getElementById('inProgressList'), done: document.getElementById('doneList') };
                 Object.values(lists).forEach(el => el.innerHTML = '');
 
-                memos.forEach((memo, index) => {
+                memos.forEach(memo => {
                     const [uid, title, content, category, attach, feedback] = memo;
-
-                    // 화면 필터링: category가 'delete'면 안 보여줌
-                    if (category === 'delete') return;
-
-                    // 사용자 필터링
                     if (filterUser !== 'all' && uid !== filterUser) return;
                     if (employeeId !== 'admin' && employeeId !== 'ksse' && uid !== employeeId) return;
 
-                    const card = createCard(index + 2, memo);
+                    const card = document.createElement('div');
+                    card.className = 'memo-card';
+                    card.draggable = true;
+                    card.dataset.json = JSON.stringify({ uid, title, content, category, attach, feedback });
+                    
+                    card.innerHTML = `<span class="user-tag">${uid}</span><h3>${title}</h3><p>${content.replace(/\n/g, '<br>')}</p>
+                        ${attach ? `<a href="${attach}" target="_blank" style="color:#007bff; text-decoration:none; font-size:0.8rem;">📎 첨부파일</a>` : ''}
+                        ${feedback ? `<div class="feedback-box"><strong>피드백:</strong> ${feedback}</div>` : ''}`;
+                    
+                    card.onclick = () => openModal(memo);
+                    card.ondragstart = (e) => { card.classList.add('dragging'); e.dataTransfer.setData('text/plain', card.dataset.json); };
+                    card.ondragend = () => card.classList.remove('dragging');
                     if (lists[category]) lists[category].appendChild(card);
                 });
-
+                
                 setupDropZones();
                 updateCounts();
-
-            } catch (e) { console.error("Fetch error", e); }
+            } catch (e) { console.error("Load Error", e); }
         }
 
-        function createCard(rowId, data) {
-            const [uid, title, content, category, attach, feedback] = data;
-            
-            const card = document.createElement('div');
-            card.className = 'memo-card';
-            card.draggable = true;
-            card.style.borderLeftColor = colorCodes[uid] || '#ccc';
-
-            card.dataset.rowId = rowId;
-            // 중요: 드래그 시 데이터 전달을 위해 JSON 저장
-            card.dataset.json = JSON.stringify({ uid, title, content, category, attach, feedback });
-
-            card.innerHTML = `
-                <span class="user-tag">${uid}</span>
-                <h3>${title}</h3>
-                <p>${content.replace(/\n/g, '<br>')}</p>
-                ${attach ? `<a href="${attach}" target="_blank" class="attach-link" onclick="event.stopPropagation()"><i class="fas fa-paperclip"></i> 첨부파일</a>` : ''}
-                ${feedback ? `<div class="feedback-box"><strong>피드백:</strong> ${feedback}</div>` : ''}
-            `;
-
-            card.onclick = () => openModal(rowId, data);
-            
-            card.ondragstart = (e) => {
-                card.classList.add('dragging');
-                e.dataTransfer.setData('text/plain', card.dataset.json);
-            };
-            card.ondragend = () => card.classList.remove('dragging');
-
-            return card;
-        }
-
-        // --- 드래그 앤 드롭 ---
         function setupDropZones() {
-            const zones = document.querySelectorAll('.event-list');
-            zones.forEach(zone => {
-                zone.ondragover = (e) => {
-                    e.preventDefault();
-                    zone.parentElement.classList.add('drag-over');
-                };
-                zone.ondragleave = () => {
-                    zone.parentElement.classList.remove('drag-over');
-                };
+            document.querySelectorAll('.event-list').forEach(zone => {
+                zone.ondragover = (e) => { e.preventDefault(); zone.parentElement.classList.add('drag-over'); };
+                zone.ondragleave = () => zone.parentElement.classList.remove('drag-over');
                 zone.ondrop = async (e) => {
-                    e.preventDefault();
-                    zone.parentElement.classList.remove('drag-over');
-
-                    const jsonStr = e.dataTransfer.getData('text/plain');
-                    if (!jsonStr) return;
-                    
-                    const data = JSON.parse(jsonStr);
+                    e.preventDefault(); zone.parentElement.classList.remove('drag-over');
+                    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
                     const newCategory = zone.id.replace('List', ''); 
-                    
                     await updateDataOnServer(data, newCategory);
                 };
             });
         }
 
         async function updateDataOnServer(data, newCategory) {
-            // 드래그 시 카테고리 업데이트는 일반 수정 로직과 동일
-            const params = new URLSearchParams({
-                userID: data.uid,
-                제목: data.title,
-                내용: data.content,
-                카테고리: newCategory,
-                첨부파일: data.attach || '',
-                피드백: data.feedback || ''
-            });
+            const params = new URLSearchParams({ userID: data.uid, 제목: data.title, 내용: data.content, 카테고리: newCategory, 첨부파일: data.attach || '', 피드백: data.feedback || '' });
             await fetch(`${API_URL}?${params.toString()}`);
             fetchAndDisplay();
         }
 
-        // --- 모달 관리 ---
-        function openModal(rowId = null, data = null) {
-            currentEditingId = rowId;
-            const modal = document.getElementById('memoModal');
-            modal.style.display = 'flex';
+        function openModal(memo = null) {
+            document.getElementById('memoModal').style.display = 'flex';
             const deleteBtn = document.getElementById('deleteMemoBtn');
-            const titleInput = document.getElementById('mTitle');
-            
-            if (data) {
-                // 수정 모드
-                currentEditingData = { uid: data[0], title: data[1], content: data[2], category: data[3], attach: data[4], feedback: data[5] };
+            if (memo) {
+                currentEditingData = { uid: memo[0], title: memo[1], content: memo[2], category: memo[3], attach: memo[4], feedback: memo[5] };
                 document.getElementById('modalTitle').textContent = '업무 수정';
-                titleInput.value = data[1];
-                document.getElementById('mContent').value = data[2];
-                document.getElementById('mAttach').value = data[4] || '';
-                document.getElementById('mFeedback').value = data[5] || '';
-                
-                // 삭제 버튼: 관리자 OR 본인일 때 표시
-                if (employeeId === 'admin' || employeeId === 'ksse' || employeeId === data[0]) {
-                    deleteBtn.style.display = 'block';
-                } else {
-                    deleteBtn.style.display = 'none';
-                }
+                document.getElementById('mTitle').value = memo[1];
+                document.getElementById('mContent').value = memo[2];
+                document.getElementById('mAttach').value = memo[4] || '';
+                document.getElementById('mFeedback').value = memo[5] || '';
+                deleteBtn.style.display = (employeeId === 'admin' || employeeId === 'ksse' || employeeId === memo[0]) ? 'block' : 'none';
             } else {
-                // 신규 등록
                 currentEditingData = null;
                 document.getElementById('modalTitle').textContent = '새 업무 등록';
-                titleInput.value = '';
-                document.getElementById('mContent').value = '';
-                document.getElementById('mAttach').value = '';
-                document.getElementById('mFeedback').value = '';
+                document.getElementById('mTitle').value = ''; document.getElementById('mContent').value = ''; document.getElementById('mAttach').value = ''; document.getElementById('mFeedback').value = '';
                 deleteBtn.style.display = 'none';
             }
-        }
-
-        function closeModal() {
-            document.getElementById('memoModal').style.display = 'none';
         }
 
         async function saveMemo() {
             const title = document.getElementById('mTitle').value.trim();
             const content = document.getElementById('mContent').value.trim();
-            const attach = document.getElementById('mAttach').value.trim();
-            const feedback = document.getElementById('mFeedback').value.trim();
-            
             const category = currentEditingData ? currentEditingData.category : 'todo';
             const writer = currentEditingData ? currentEditingData.uid : employeeId;
-
             if (!title) return alert('제목을 입력하세요.');
 
-            const params = new URLSearchParams({
-                userID: writer,
-                제목: title,
-                내용: content,
-                카테고리: category,
-                첨부파일: attach,
-                피드백: feedback
-            });
-
-            await fetch(`${API_URL}?${params.toString()}`);
-            closeModal();
-            fetchAndDisplay();
+            const params = new URLSearchParams({ userID: writer, 제목: title, 내용: content, 카테고리: category, 첨부파일: document.getElementById('mAttach').value, 피드백: document.getElementById('mFeedback').value });
+            
+            try {
+                const resp = await fetch(`${API_URL}?${params.toString()}`);
+                if (!resp.ok) { const err = await resp.json(); alert("오류: " + err.message); return; }
+                closeModal(); fetchAndDisplay();
+            } catch(e) { alert("통신 오류 발생"); }
         }
 
-        // *** 수정된 부분: 프론트엔드에서 삭제 분기 처리 ***
         async function deleteMemo() {
             if (!confirm("정말로 삭제하시겠습니까?")) return;
-            if (!currentEditingData) return;
-
             let params;
-
-            // 로직 1: 완료(done) 상태면 -> action을 보내지 않고 카테고리만 'delete'로 수정 (Soft Delete)
             if (currentEditingData.category === 'done') {
-                params = new URLSearchParams({
-                    userID: currentEditingData.uid,
-                    제목: currentEditingData.title,
-                    내용: currentEditingData.content,
-                    카테고리: 'delete', // 시트 값을 'delete'로 변경 요청
-                    첨부파일: currentEditingData.attach || '',
-                    피드백: currentEditingData.feedback || ''
-                });
+                params = new URLSearchParams({ userID: currentEditingData.uid, 제목: currentEditingData.title, 내용: currentEditingData.content, 카테고리: 'delete' });
+            } else {
+                params = new URLSearchParams({ action: 'delete', userID: currentEditingData.uid, 제목: currentEditingData.title });
             }
-            // 로직 2: 그 외(todo, inProgress) -> action='delete'를 보내서 행 삭제 (Hard Delete)
-            else {
-                params = new URLSearchParams({
-                    action: 'delete',
-                    userID: currentEditingData.uid,
-                    제목: currentEditingData.title,
-                    카테고리: currentEditingData.category
-                });
-            }
-
-            const resp = await fetch(`${API_URL}?${params.toString()}`);
-            const res = await resp.json();
-            
-            alert(res.message || "처리되었습니다.");
-            closeModal();
-            fetchAndDisplay();
+            await fetch(`${API_URL}?${params.toString()}`);
+            closeModal(); fetchAndDisplay();
         }
 
-        function updateCounts() {
-            document.querySelectorAll('.category').forEach(cat => {
-                cat.querySelector('.count').textContent = cat.querySelector('.event-list').children.length;
-            });
-        }
+        function closeModal() { document.getElementById('memoModal').style.display = 'none'; }
+        function updateCounts() { document.querySelectorAll('.category').forEach(cat => { cat.querySelector('.count').textContent = cat.querySelector('.event-list').children.length; }); }
 
-        // --- 관리자 필터 ---
         async function setupAdminFilter() {
             if (employeeId === 'admin' || employeeId === 'ksse') {
                 const filter = document.getElementById('employeeFilter');
@@ -415,15 +231,9 @@
                 try {
                     const resp = await fetch(`${API_URL}?action=getEmployees`);
                     const employees = await resp.json();
-                    filter.innerHTML = '<option value="all">전체 사원 보기</option>';
-                    employees.forEach(emp => {
-                        const opt = document.createElement('option');
-                        opt.value = emp;
-                        opt.textContent = emp;
-                        filter.appendChild(opt);
-                    });
+                    filter.innerHTML = '<option value="all">전체 사원 보기</option>' + employees.map(emp => `<option value="${emp}">${emp}</option>`).join('');
                     filter.onchange = (e) => fetchAndDisplay(e.target.value);
-                } catch(e) { console.error("Filter setup error", e); }
+                } catch(e) {}
             }
         }
     </script>
