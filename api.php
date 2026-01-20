@@ -53,7 +53,23 @@ try {
         echo json_encode($list);
         exit;
     }
-
+    
+    // [기능 1-1] 사원 색상 목록 조회 (추가된 기능)
+if ($action === 'getColors') {
+    // ksse_employees 테이블에서 이름과 색상 코드를 가져옴
+    $sql = "SELECT name, color_code FROM ksse_employees";
+    $result = $conn->query($sql);
+    $colors = [];
+    
+    if ($result) {
+        while($row = $result->fetch_assoc()) {
+            // "이름": "색상코드" 형태의 JSON 객체로 만듦
+            $colors[$row['name']] = $row['color_code']; 
+        }
+    }
+    echo json_encode($colors);
+    exit;
+}
     // [기능 2] 삭제
     if ($action === 'delete') {
         if ($category === 'done') {
